@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import awswrangler as wr
 import boto3
@@ -48,10 +48,10 @@ def load_session_data(session_id: str) -> pd.DataFrame:
         return df
 
     except Exception as e:
-        raise ValueError(f"Error loading session data: {e}")
+        raise ValueError(f"Error loading session data: {e}") from e
 
 
-def get_session_from_memory(session_id: str) -> Optional[dict[str, Any]]:
+def get_session_from_memory(session_id: str) -> dict[str, Any] | None:
     """
     Get session metadata from AgentCore memory.
     Returns the session info dict or None if not found.

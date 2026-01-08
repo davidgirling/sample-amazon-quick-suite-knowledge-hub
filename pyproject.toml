@@ -29,8 +29,10 @@ only-include = ["README.md"]
 target-version = "py311"
 line-length = 88
 exclude = [
-    "docs/use-cases/*/tools/",
-    "docs/use-cases/*/cdk/",
+    ".venv/",
+    ".ruff_cache/",
+    "node_modules/",
+    "site/",
 ]
 
 [tool.ruff.lint]

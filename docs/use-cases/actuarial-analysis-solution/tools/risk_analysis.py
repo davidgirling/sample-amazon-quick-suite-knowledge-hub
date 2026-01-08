@@ -86,7 +86,7 @@ class RiskAnalysisService:
             }
 
         except Exception as e:
-            raise Exception(f"Failed to analyze risk factors: {str(e)}")
+            raise Exception(f"Failed to analyze risk factors: {str(e)}") from e
 
     def _identify_risk_factors(self, df: pd.DataFrame) -> list[str]:
         risk_factors = []
@@ -267,7 +267,7 @@ class RiskAnalysisService:
                     patterns.append(
                         {
                             "type": "increasing_frequency",
-                            "description": f"Claim frequency increased by {((recent_avg/historical_avg - 1) * 100):.1f}% in recent months",
+                            "description": f"Claim frequency increased by {((recent_avg / historical_avg - 1) * 100):.1f}% in recent months",
                             "severity": "medium",
                         }
                     )
@@ -284,7 +284,7 @@ class RiskAnalysisService:
                 patterns.append(
                     {
                         "type": "high_severity_outliers",
-                        "description": f"{len(outliers)} claims ({len(outliers)/len(df)*100:.1f}%) exceed normal severity range",
+                        "description": f"{len(outliers)} claims ({len(outliers) / len(df) * 100:.1f}%) exceed normal severity range",
                         "severity": "high",
                     }
                 )
@@ -378,7 +378,7 @@ class RiskAnalysisService:
             }
 
         except Exception as e:
-            raise Exception(f"Failed to detect risk trends: {str(e)}")
+            raise Exception(f"Failed to detect risk trends: {str(e)}") from e
 
     def _analyze_risk_factor_stability(
         self, historical_df: pd.DataFrame, current_df: pd.DataFrame

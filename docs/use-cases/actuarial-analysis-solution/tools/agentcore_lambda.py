@@ -26,6 +26,13 @@ import os
 from datetime import datetime
 
 import boto3
+
+# Import actuarial analysis modules
+import fraud_detection
+import litigation_analysis
+import loss_reserving
+import monitoring
+import risk_analysis
 from utils.data_utils import load_session_data
 
 # Set root logger level explicitly
@@ -34,12 +41,6 @@ logging.getLogger().setLevel(logging.INFO)
 # Get logger for this module
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-import fraud_detection
-import litigation_analysis
-import loss_reserving
-import monitoring
-import risk_analysis
 
 
 def lambda_handler(event, context):
@@ -135,19 +136,15 @@ def lambda_handler(event, context):
             result = litigation_analysis.detect_litigation(
                 data_event, litigation_config
             )
-            event_type = "litigation_analysis"
         elif tool_name == "score_fraud_risk":
             logger.info("Executing fraud risk scoring")
             result = fraud_detection.score_fraud_risk(data_event, fraud_config)
-            event_type = "fraud_scores"
         elif tool_name == "analyze_risk_factors":
             logger.info("Executing risk factor analysis")
             result = risk_analysis.analyze_risk_factors(data_event)
-            event_type = "risk_analysis"
         elif tool_name == "build_loss_triangles":
             logger.info("Executing loss triangle construction")
             result = loss_reserving.build_loss_triangles(data_event)
-            event_type = "loss_triangles"
             logger.info(
                 f"Triangle construction result keys: {list(result.keys()) if isinstance(result, dict) else 'Not a dict'}"
             )
@@ -257,10 +254,8 @@ def lambda_handler(event, context):
                 print(f"Error retrieving triangle data from memory: {memory_error}")
 
             result = loss_reserving.calculate_reserves(triangles_data)
-            event_type = "reserves"
         elif tool_name == "monitor_development":
             result = monitoring.monitor_development(data_event, monitoring_config)
-            event_type = "monitoring"
         else:
             return {
                 "statusCode": 400,

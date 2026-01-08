@@ -28,6 +28,7 @@ from typing import Any
 
 import awswrangler as wr
 import boto3
+from utils.data_utils import store_session_metadata
 
 # Set up logging
 # Set root logger level explicitly
@@ -36,7 +37,6 @@ logging.getLogger().setLevel(logging.INFO)
 # Get logger for this module
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-from utils.data_utils import store_session_metadata
 
 # Initialize AWS clients
 athena = boto3.client("athena")
@@ -103,7 +103,7 @@ def describe_table() -> dict[str, Any]:
 
         # First check if database exists and list available tables
         try:
-            db_response = glue.get_database(Name=database_name)
+            glue.get_database(Name=database_name)
             tables_response = glue.get_tables(DatabaseName=database_name)
             available_tables = [t["Name"] for t in tables_response.get("TableList", [])]
         except Exception as db_error:
@@ -159,7 +159,7 @@ def wait_for_athena_query(athena, query_execution_id, delay=1, max_attempts=300)
             result = athena.get_query_execution(QueryExecutionId=query_execution_id)
             status = result["QueryExecution"]["Status"]["State"]
         except Exception as e:
-            raise RuntimeError(f"Failed to get query status: {str(e)}")
+            raise RuntimeError(f"Failed to get query status: {str(e)}") from e
 
         if status == "SUCCEEDED":
             return result
@@ -210,7 +210,7 @@ def run_query(query: str, natural_language_description: str = "") -> dict[str, A
 
         # Wait for query completion
         try:
-            result = wait_for_athena_query(athena, query_execution_id)
+            wait_for_athena_query(athena, query_execution_id)
         except (RuntimeError, TimeoutError) as e:
             return {
                 "event_type": "error",
@@ -267,7 +267,7 @@ def run_query(query: str, natural_language_description: str = "") -> dict[str, A
             }
 
         # Store S3 path in memory
-        success = store_session_metadata(
+        store_session_metadata(
             session_id=session_id,
             s3_parquet_path=s3_output_path,
             row_count=estimated_rows,

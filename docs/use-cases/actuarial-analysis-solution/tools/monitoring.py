@@ -78,7 +78,7 @@ class MonitoringService:
             }
 
         except Exception as e:
-            raise Exception(f"Failed to monitor claim development: {str(e)}")
+            raise Exception(f"Failed to monitor claim development: {str(e)}") from e
 
     def _calculate_kpis(self, df: pd.DataFrame) -> list[KPI]:
         kpis = []

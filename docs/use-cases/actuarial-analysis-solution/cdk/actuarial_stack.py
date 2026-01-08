@@ -4,7 +4,6 @@ import subprocess
 import uuid
 
 from aws_cdk import CfnOutput, CustomResource, Duration, RemovalPolicy, Stack
-from aws_cdk import aws_athena as athena
 from aws_cdk import aws_glue as glue
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as lambda_
@@ -113,17 +112,7 @@ class ActuarialToolsStack(Stack):
             ),
         )
 
-        # Athena Workgroup
-        athena_workgroup = athena.CfnWorkGroup(
-            self,
-            "ActuarialWorkGroup",
-            name=f"actuarial-workgroup-{bucket_suffix}",
-            work_group_configuration=athena.CfnWorkGroup.WorkGroupConfigurationProperty(
-                result_configuration=athena.CfnWorkGroup.ResultConfigurationProperty(
-                    output_location=f"s3://{athena_results_bucket.bucket_name}/query-results/"
-                )
-            ),
-        )
+        # Athena Workgroup configuration is handled by the workgroup name in environment variables
 
         # Lambda Layers
         self._build_agentcore_layer()

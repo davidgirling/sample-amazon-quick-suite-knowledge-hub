@@ -294,7 +294,7 @@ class LossReservingService:
             }
 
         except Exception as e:
-            raise Exception(f"Failed to calculate chain ladder: {str(e)}")
+            raise Exception(f"Failed to calculate chain ladder: {str(e)}") from e
 
     def calculate_bornhuetter_ferguson(self, triangles_data, chain_ladder_result):
         """Calculate reserves using Bornhuetter-Ferguson methodology with standard actuarial assumptions."""
@@ -316,7 +316,7 @@ class LossReservingService:
             incurred_df = pd.DataFrame(incurred_data).fillna(0)
             incurred_cumulative = incurred_df.cumsum(axis=1)
 
-            cl_ultimates = chain_ladder_result.get("ultimate_values", {})
+            chain_ladder_result.get("ultimate_values", {})
             cl_dev_factors = chain_ladder_result.get("development_factors", {})
 
             # Calculate expected loss ratios using policy count proxy (standard actuarial practice)

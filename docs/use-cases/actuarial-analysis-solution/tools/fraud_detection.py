@@ -93,7 +93,7 @@ class FraudDetectionService:
 
         try:
             age = int(claim.get("driverage") or 0)
-        except:
+        except (ValueError, TypeError):
             age = 0
 
         if age and (
@@ -106,7 +106,7 @@ class FraudDetectionService:
 
         try:
             vehicle_year = int(claim.get("vehicleyear") or 0)
-        except:
+        except (ValueError, TypeError):
             vehicle_year = 0
 
         if vehicle_year:
@@ -210,7 +210,7 @@ class FraudDetectionService:
             if ratio > 1.0 or ratio < 0.3:
                 return min(1.0, abs(ratio - 0.75) * 2.0)
             return 0.0
-        except:
+        except (ValueError, TypeError, ZeroDivisionError):
             return 0.0
 
     def _detect_organized_fraud(
