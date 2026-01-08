@@ -1,0 +1,46 @@
+## Description
+
+Brief description of changes to the Amazon Quick Suite Knowledge Hub
+
+## Type of Change
+
+- [ ] Bug fix (fixes an issue in integration guides or use cases)
+- [ ] New integration guide (adds setup documentation for a supported service)
+- [ ] New use case (adds end-to-end solution example)
+- [ ] Documentation improvement (updates existing content)
+- [ ] Website enhancement (navigation, styling, or functionality)
+
+## Testing
+
+- [ ] Documentation builds successfully (`mkdocs build`)
+- [ ] All links are valid and working
+- [ ] Content renders correctly locally (`mkdocs serve`)
+- [ ] Integration steps tested (if applicable)
+- [ ] Screenshots and images display properly
+
+## Checklist
+
+- [ ] My content follows the Amazon Quick Suite Knowledge Hub style guidelines
+- [ ] I have performed a self-review of my content
+- [ ] I have updated navigation (mkdocs.yml) if adding new content
+- [ ] My changes generate no new warnings or errors
+- [ ] All external links are valid and accessible
+- [ ] Content is accurate and up-to-date
+
+## Amazon Quick Suite Knowledge Hub Guidelines
+
+- [ ] No hardcoded secrets, credentials, or sensitive data
+- [ ] All service names and versions are specified
+- [ ] Screenshots include proper Amazon Quick Suite branding
+- [ ] Integration steps are clear and complete
+- [ ] Troubleshooting section included (if applicable)
+
+## Breaking Changes
+
+List any breaking changes and migration instructions:
+
+N/A
+
+## Additional Notes
+
+Add any additional context about this contribution to the Amazon Quick Suite Knowledge Hub.

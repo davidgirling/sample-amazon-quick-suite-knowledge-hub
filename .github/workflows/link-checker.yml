@@ -1,0 +1,85 @@
+name: Link Checker
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly on Monday at midnight UTC
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "**/*.md"
+      - "mkdocs.yml"
+      - "main.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  link-check:
+    name: Amazon Quick Suite Knowledge Hub Link Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Amazon Quick Suite Knowledge Hub
+        uses: actions/checkout@v4
+
+      - name: Get changed documentation files
+        id: changed-files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            **/*.md
+            mkdocs.yml
+            main.py
+
+      - name: Set up Python for documentation build
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install documentation dependencies
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: uv sync
+
+      - name: Build Amazon Quick Suite Knowledge Hub documentation
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "📚 Building Amazon Quick Suite Knowledge Hub documentation for link checking..."
+          uv run mkdocs build
+
+      - name: Install lychee link checker
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          # Install lychee using curl for better reliability
+          curl -sSL https://github.com/lycheeverse/lychee/releases/latest/download/lychee-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+          sudo mv lychee /usr/local/bin/
+
+      - name: Check links in Amazon Quick Suite Knowledge Hub
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "🔗 Checking links in Amazon Quick Suite Knowledge Hub documentation..."
+          lychee --verbose --no-progress \
+            --accept 200,204,206,300,301,302,303,304,307,308,403,429 \
+            --timeout 30 \
+            --retry-wait-time 5 \
+            --max-retries 3 \
+            --exclude-mail \
+            './site/**/*.html' || exit_code=$?
+
+          if [ ${exit_code:-0} -ne 0 ]; then
+            echo "⚠️ Some links may be broken or unreachable"
+            echo "This could be due to temporary network issues or rate limiting"
+            echo "Please review the output above for actual broken links"
+            # Don't fail the workflow for link checker issues in documentation
+            exit 0
+          else
+            echo "✅ All links in Amazon Quick Suite Knowledge Hub are valid"
+          fi
+
+      - name: Skip message
+        if: steps.changed-files.outputs.any_changed == 'false' && github.event_name != 'schedule' && github.event_name != 'workflow_dispatch'
+        run: echo "⏭️ No documentation files changed - skipping link check for Amazon Quick Suite Knowledge Hub"

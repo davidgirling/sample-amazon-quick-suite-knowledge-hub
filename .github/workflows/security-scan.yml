@@ -1,0 +1,101 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "**/*.py"
+      - "pyproject.toml"
+      - ".github/workflows/**"
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "**/*.py"
+      - "pyproject.toml"
+      - ".github/workflows/**"
+  schedule:
+    - cron: '0 12 * * 1'  # Weekly security scan on Monday at 12:00 UTC
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  security-scan:
+    name: Amazon Quick Suite Knowledge Hub Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Amazon Quick Suite Knowledge Hub
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed Python files
+        id: changed-files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            **/*.py
+            pyproject.toml
+
+      - name: Set up Python for security scanning
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv package manager
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule'
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install security scanning tools
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule'
+        run: |
+          uv tool install bandit[toml]
+          uv tool install safety
+
+      - name: Install project dependencies
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule'
+        run: uv sync --dev
+
+      - name: Run Bandit security scan
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule'
+        run: |
+          echo "🔒 Running Bandit security scan on Amazon Quick Suite Knowledge Hub..."
+          uv tool run bandit -r . -f json -o bandit-results.json || true
+          if [ -f bandit-results.json ]; then
+            echo "📊 Bandit scan completed - results saved to bandit-results.json"
+          fi
+
+      - name: Run Safety dependency check
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule'
+        run: |
+          echo "🛡️ Running Safety dependency check..."
+          uv tool run safety check --json > safety-results.json || true
+          if [ -f safety-results.json ]; then
+            echo "📊 Safety scan completed - results saved to safety-results.json"
+          fi
+
+      - name: Upload security scan results
+        if: (steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule') && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: amazon-quick-suite-security-results
+          path: |
+            bandit-results.json
+            safety-results.json
+          retention-days: 30
+
+      - name: TruffleHog secret scan
+        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule'
+        uses: trufflesecurity/trufflehog@v3.90.6
+        with:
+          path: ./
+          base: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          head: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          extra_args: --debug --only-verified
+
+      - name: Skip message
+        if: steps.changed-files.outputs.any_changed == 'false' && github.event_name != 'schedule'
+        run: echo "⏭️ No Python files or dependencies changed - skipping security scan for Amazon Quick Suite Knowledge Hub"

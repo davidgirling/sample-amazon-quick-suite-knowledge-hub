@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🤝 Community Discussions
+    url: https://github.com/aws-samples/sample-amazon-quick-suite-knowledge-hub/discussions
+    about: Ask questions and discuss Amazon Quick Suite Knowledge Hub with the community
+  - name: 📚 Amazon Quick Suite Documentation
+    url: https://docs.aws.amazon.com/quicksuite/
+    about: Official Amazon Quick Suite documentation and API reference
+  - name: 🎯 Amazon Quick Suite Community
+    url: https://community.amazonquicksight.com/
+    about: Join the broader Amazon Quick Suite community for tips and best practices
+  - name: 🔒 Security Issues
+    url: https://github.com/aws-samples/sample-amazon-quick-suite-knowledge-hub/security/policy
+    about: Report security vulnerabilities privately through our security policy
