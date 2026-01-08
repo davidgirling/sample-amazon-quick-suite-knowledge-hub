@@ -5,6 +5,34 @@ def define_env(env):
     """Hook for defining macros and variables"""
     
     @env.macro
+    def get_integrations():
+        """Dynamically scan integration directories"""
+        integrations = {'knowledge-base': [], 'actions': []}
+        
+        integration_configs = [
+            {'type': 'actions', 'dir': 'docs/integration/actions', 'key': 'actions'},
+            {'type': 'knowledge base', 'dir': 'docs/integration/knowledge base', 'key': 'knowledge-base'}
+        ]
+        
+        for config in integration_configs:
+            dir_path = config['dir']
+            if os.path.exists(dir_path):
+                for item in os.listdir(dir_path):
+                    item_path = os.path.join(dir_path, item)
+                    readme_path = os.path.join(item_path, 'README.md')
+                    
+                    if os.path.isdir(item_path) and os.path.exists(readme_path):
+                        title = get_title_from_file(readme_path) or item.replace('-', ' ').title()
+                        # Relative path from integration/ directory
+                        relative_path = f"{config['type']}/{item}/README.md"
+                        integrations[config['key']].append({
+                            'title': title,
+                            'path': relative_path
+                        })
+        
+        return integrations
+    
+    @env.macro
     def get_use_cases():
         """Dynamically scan use-cases directory and categorize by any README tags"""
         
@@ -41,12 +69,11 @@ def define_env(env):
                     meta = extract_frontmatter(content)
                     
                     # Extract title from first # heading if available
-                    title_match = re.search(r'^#\s+(.+)$', content, re.MULTILINE)
-                    title = title_match.group(1) if title_match else item.replace('-', ' ').title()
+                    title = get_title_from_file(readme_path) or item.replace('-', ' ').title()
                     
                     project_info = {
                         'title': title,
-                        'url': f'{item}/',
+                        'url': f'{item}/README.md',
                         'description': meta.get('description', f'{title} solution')
                     }
                     
@@ -58,3 +85,13 @@ def define_env(env):
                         categories[category].append(project_info)
         
         return categories
+
+def get_title_from_file(file_path):
+    """Extract title from markdown file's first heading"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            title_match = re.search(r'^#\s+(.+)$', content, re.MULTILINE)
+            return title_match.group(1) if title_match else None
+    except:
+        return None

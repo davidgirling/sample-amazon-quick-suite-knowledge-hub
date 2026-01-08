@@ -1,19 +1,27 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: '[BUG] '
-labels: 'bug'
-assignees: ''
-
+name: "Bug Report 🐛"
+about: Report a bug in Amazon Quick Suite Knowledge Hub
+title: "[BUG] "
+labels: bug
+assignees: '@aws-samples/quick-suite-team'
 ---
 
 **Describe the bug**
 A clear and concise description of what the bug is.
 
+**Component**
+Which part of the Knowledge Hub has the issue?
+- [ ] Integration Guide
+- [ ] Use Case  
+- [ ] Documentation
+- [ ] Website/Navigation
+
+**Service/Component Name:** _______________
+
 **To Reproduce**
 Steps to reproduce the behavior:
-1. Install package with '...'
-2. Run command '....'
+1. Go to '...'
+2. Follow step '....'
 3. See error
 
 **Expected behavior**
@@ -21,14 +29,13 @@ A clear and concise description of what you expected to happen.
 
 **Error Output**
 ```
-Paste any error messages or stack traces here
+Paste any error messages or logs here
 ```
 
-**Environment:**
- - OS: [e.g. Ubuntu 22.04, macOS 13.0, Windows 11]
- - Python version: [e.g. 3.10.5]
- - Package version: [e.g. 0.1.0]
- - Installation method: [pip, conda, from source]
+**Environment**
+- OS: [e.g. macOS 14, Windows 11, Ubuntu 22.04]
+- Browser: [e.g. Chrome 120, Safari 17]
+- Amazon Quick Suite Region: [e.g. us-east-1]
 
 **Additional context**
 Add any other context about the problem here.
