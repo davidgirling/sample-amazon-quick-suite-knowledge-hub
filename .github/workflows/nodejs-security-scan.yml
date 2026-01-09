@@ -51,15 +51,24 @@ jobs:
             **/*.ts
             **/*.tsx
 
-      - name: Setup Node.js
+      - name: Check for Node.js projects
         if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule'
+        id: check-nodejs
+        run: |
+          if find . -name "package.json" -not -path "./node_modules/*" | grep -q .; then
+            echo "has_nodejs=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_nodejs=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Node.js
+        if: (steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule') && steps.check-nodejs.outputs.has_nodejs == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Find Node.js projects
-        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule'
+        if: (steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule') && steps.check-nodejs.outputs.has_nodejs == 'true'
         id: find-projects
         run: |
           echo "🔍 Finding Node.js projects for security scanning..."
@@ -71,7 +80,7 @@ jobs:
           echo "$projects"
 
       - name: Install dependencies and run security scans
-        if: steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule'
+        if: (steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule') && steps.check-nodejs.outputs.has_nodejs == 'true'
         run: |
           echo "🔒 Running security scans on Node.js projects..."
           mkdir -p security-results
@@ -99,7 +108,7 @@ jobs:
           done <<< "${{ steps.find-projects.outputs.projects }}"
 
       - name: Upload Node.js security scan results
-        if: (steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule') && always()
+        if: (steps.changed-files.outputs.any_changed == 'true' || github.event_name == 'schedule') && steps.check-nodejs.outputs.has_nodejs == 'true' && always()
         uses: actions/upload-artifact@v4
         with:
           name: nodejs-security-results

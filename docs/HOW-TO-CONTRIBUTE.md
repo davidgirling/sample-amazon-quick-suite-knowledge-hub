@@ -121,12 +121,12 @@ When contributing content, please ensure:
 - Include a **README.md** file for each integration or use case
 - Add **frontmatter** with metadata when applicable:
 
-  ```yaml
-  ---
-  category: Capability
-  description: "Brief description of your project for metadata"
-  ---
-  ```
+```yaml
+---
+category: Capability
+description: "Brief description of your project for metadata"
+---
+```
 
 ## Issue Guidelines
 
@@ -194,11 +194,12 @@ npm install
 When contributing Node.js/React/Next.js projects:
 
 **Package.json Requirements:**
+
 ```json
 {
   "scripts": {
     "dev": "next dev",
-    "build": "next build", 
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   }
@@ -206,16 +207,19 @@ When contributing Node.js/React/Next.js projects:
 ```
 
 **ESLint Configuration:**
+
 - Use `eslint-config-next` for Next.js projects
 - Include security-focused rules
 - Configure for TypeScript if applicable
 
 **TypeScript Configuration:**
+
 - Use strict mode: `"strict": true`
 - Include proper path mapping
 - Configure for React/Next.js as needed
 
 **Security Best Practices:**
+
 - Keep dependencies updated
 - Use `npm audit` to check for vulnerabilities
 - Avoid hardcoded secrets or API keys
@@ -226,7 +230,8 @@ When contributing Node.js/React/Next.js projects:
 When contributing Python projects (CDK, Lambda functions, documentation):
 
 **Project Structure:**
-```
+
+```text
 project/
 ├── pyproject.toml          # Project metadata and dependencies
 ├── uv.lock                 # Locked dependency versions
@@ -235,6 +240,7 @@ project/
 ```
 
 **pyproject.toml Requirements:**
+
 ```toml
 [project]
 name = "your-project"
@@ -251,12 +257,14 @@ dev = ["pytest", "black", "ruff"]
 ```
 
 **Code Quality Standards:**
+
 - Use `ruff` for linting and formatting
 - Follow PEP 8 style guidelines
 - Use type hints where applicable
 - Include docstrings for functions and classes
 
 **Security Best Practices:**
+
 - Keep dependencies updated with `uv sync --upgrade`
 - Use `bandit` for security scanning
 - Avoid hardcoded credentials
@@ -293,6 +301,7 @@ git push origin my-branch
 ### What the Hooks Check
 
 **On every commit** (~30-60 seconds):
+
 - ✅ **Python code formatting** (auto-fixes with ruff)
 - ✅ **Import sorting** (auto-fixes)
 - ✅ **Python linting** (with ruff)
@@ -302,6 +311,7 @@ git push origin my-branch
 - ✅ **Documentation build** (mkdocs build --strict)
 
 **For Node.js projects** (additional checks):
+
 - ✅ **TypeScript/JavaScript linting** (ESLint)
 - ✅ **Type checking** (TypeScript compiler)
 - ✅ **Build verification** (Next.js/React builds)
@@ -320,6 +330,7 @@ git commit --no-verify -m "wip: incomplete work"
 ### Running Checks Manually
 
 **Python project checks:**
+
 ```bash
 # Run all pre-commit checks
 uv run pre-commit run --all-files
@@ -339,6 +350,7 @@ uv add --dev pytest
 ```
 
 **Node.js project checks:**
+
 ```bash
 # Navigate to your Node.js project directory
 cd docs/use-cases/your-nodejs-project
@@ -383,7 +395,7 @@ The built site will be in the `site/` directory.
 
 Place your project in the appropriate directory:
 
-```
+```text
 docs/
 ├── integration/           # For integration guides
 │   ├── knowledge-base/   # Knowledge base integrations
@@ -437,6 +449,7 @@ Each project must include:
 - **.gitignore** - Appropriate gitignore file
 
 **For Node.js/React projects, also include:**
+
 - **package.json** - Node.js dependencies and scripts
 - **tsconfig.json** - TypeScript configuration (for TypeScript projects)
 - **.eslintrc.js/.eslintrc.json** - ESLint configuration
