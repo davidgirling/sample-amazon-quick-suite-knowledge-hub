@@ -11,10 +11,10 @@ Features:
 - Bedrock AgentCore Gateway compatibility
 """
 
+import logging
 import os
 import sys
 import tempfile
-import logging
 
 import boto3
 from mcp.client.stdio import StdioServerParameters

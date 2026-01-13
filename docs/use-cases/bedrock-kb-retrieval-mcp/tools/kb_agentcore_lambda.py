@@ -1,6 +1,6 @@
 import json
-import os
 import logging
+import os
 from typing import Any
 
 import boto3
@@ -95,7 +95,9 @@ def list_knowledge_bases(bedrock_agent) -> dict[str, Any]:
                                 {"id": ds.get("dataSourceId"), "name": ds.get("name")}
                             )
                 except Exception as ds_error:
-                    logger.warning(f"Could not retrieve data sources for KB {kb_id}: {str(ds_error)}")
+                    logger.warning(
+                        f"Could not retrieve data sources for KB {kb_id}: {str(ds_error)}"
+                    )
                     # Skip data sources that can't be retrieved
 
                 result[kb_id] = {
@@ -141,9 +143,7 @@ def query_knowledge_bases(
 
         # Build retrieval configuration
         retrieval_config = {
-            "vectorSearchConfiguration": {
-                "numberOfResults": number_of_results
-            }
+            "vectorSearchConfiguration": {"numberOfResults": number_of_results}
         }
 
         # Add data source filter if specified

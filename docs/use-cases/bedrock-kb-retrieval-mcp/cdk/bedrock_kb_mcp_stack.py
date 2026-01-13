@@ -5,29 +5,39 @@ CDK stack that deploys Amazon Bedrock Knowledge Base integration with Amazon Qui
 using MCP through BedrockAgentCore Gateway constructs.
 """
 
+import hashlib
 import json
 import os
 import re
-import hashlib
+
 from aws_cdk import (
-    Stack,
     CfnOutput,
     Duration,
-    aws_iam as iam,
-    aws_lambda as _lambda,
+    Stack,
+)
+from aws_cdk import (
     aws_bedrockagentcore as bedrockagentcore,
+)
+from aws_cdk import (
     aws_cognito as cognito,
+)
+from aws_cdk import (
+    aws_iam as iam,
+)
+from aws_cdk import (
+    aws_lambda as _lambda,
 )
 from constructs import Construct
 
 # Print CDK version info for debugging
 try:
     import aws_cdk
-    if os.getenv('CDK_DEBUG'):
+
+    if os.getenv("CDK_DEBUG"):
         print(f"CDK Version: {getattr(aws_cdk, '__version__', 'unknown')}")
         print(f"BedrockAgentCore available: {hasattr(bedrockagentcore, 'CfnGateway')}")
 except Exception as e:
-    if os.getenv('CDK_DEBUG'):
+    if os.getenv("CDK_DEBUG"):
         print(f"CDK version check failed: {e}")
 
 
@@ -37,8 +47,12 @@ class BedrockKBNativeStack(Stack):
 
         # Cognito domain prefix (must be globally unique & match pattern)
         raw_prefix = f"{self.stack_name}-{self.account[-6:]}"
-        sanitized = re.sub("[^a-z0-9-]", "-", raw_prefix.lower()).strip("-")[:40] or "app"
-        h = hashlib.sha1(raw_prefix.encode("utf-8"), usedforsecurity=False).hexdigest()[:6]
+        sanitized = (
+            re.sub("[^a-z0-9-]", "-", raw_prefix.lower()).strip("-")[:40] or "app"
+        )
+        h = hashlib.sha1(raw_prefix.encode("utf-8"), usedforsecurity=False).hexdigest()[
+            :6
+        ]
         domain_prefix = f"{sanitized}-{h}"
 
         # IAM role for KB Lambda function
@@ -114,26 +128,24 @@ class BedrockKBNativeStack(Stack):
         # Hosted Cognito domain
         user_pool_domain = user_pool.add_domain(
             "BedrockKBUserPoolDomain",
-            cognito_domain=cognito.CognitoDomainOptions(
-                domain_prefix=domain_prefix
-            ),
+            cognito_domain=cognito.CognitoDomainOptions(domain_prefix=domain_prefix),
         )
 
         # Add custom resource scope for the gateway
         resource_server_name = f"{self.stack_name.lower()}-pool"
         custom_scope_name = "invoke"  # Keep "invoke" as requested
-        
+
         # Create the scope object first
         invoke_scope = cognito.ResourceServerScope(
             scope_name=custom_scope_name,
-            scope_description="Scope for invoking the agentcore gateway"
+            scope_description="Scope for invoking the agentcore gateway",
         )
-        
+
         resource_server = user_pool.add_resource_server(
             "BedrockKBResourceServer",
             identifier=resource_server_name,  # Same as resource server name
             user_pool_resource_server_name=resource_server_name,
-            scopes=[invoke_scope]
+            scopes=[invoke_scope],
         )
 
         user_pool_client = cognito.UserPoolClient(
@@ -142,7 +154,9 @@ class BedrockKBNativeStack(Stack):
             user_pool=user_pool,
             user_pool_client_name=f"{self.stack_name}-client",
             generate_secret=True,
-            supported_identity_providers=[cognito.UserPoolClientIdentityProvider.COGNITO],
+            supported_identity_providers=[
+                cognito.UserPoolClientIdentityProvider.COGNITO
+            ],
             o_auth=cognito.OAuthSettings(
                 flows=cognito.OAuthFlows(client_credentials=True),
                 scopes=[
@@ -200,7 +214,7 @@ class BedrockKBNativeStack(Stack):
             ),
             role_arn=gateway_role.role_arn,
         )
-        
+
         # Add explicit dependency to ensure Cognito is created first
         mcp_gateway.add_dependency(user_pool.node.default_child)
         mcp_gateway.add_dependency(user_pool_client.node.default_child)
@@ -209,7 +223,7 @@ class BedrockKBNativeStack(Stack):
         kb_tools_path = os.path.join(
             os.path.dirname(__file__), "..", "tools", "kb_agentcore_tools.json"
         )
-        
+
         with open(kb_tools_path, encoding="utf-8") as f:
             kb_tools = json.load(f)
 
@@ -218,10 +232,10 @@ class BedrockKBNativeStack(Stack):
             self,
             "BedrockKBGatewayTarget",
             credential_provider_configurations=[
-        bedrockagentcore.CfnGatewayTarget.CredentialProviderConfigurationProperty(
-            credential_provider_type="GATEWAY_IAM_ROLE",
-        )
-    ],
+                bedrockagentcore.CfnGatewayTarget.CredentialProviderConfigurationProperty(
+                    credential_provider_type="GATEWAY_IAM_ROLE",
+                )
+            ],
             name="kb-lambda-target",
             gateway_identifier=mcp_gateway.attr_gateway_identifier,
             target_configuration=bedrockagentcore.CfnGatewayTarget.TargetConfigurationProperty(
@@ -237,7 +251,7 @@ class BedrockKBNativeStack(Stack):
         )
 
         gateway_target.add_dependency(mcp_gateway)
-        
+
         # Outputs
         CfnOutput(
             self,
