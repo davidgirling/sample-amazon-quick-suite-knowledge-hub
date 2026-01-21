@@ -320,7 +320,7 @@ Example queries:
 
 ## Security
 
-See [CONTRIBUTING](../../HOW-TO-CONTRIBUTE.md) for more information.
+See [CONTRIBUTING](/HOW-TO-CONTRIBUTE.md) for more information.
 
 ## License
 
